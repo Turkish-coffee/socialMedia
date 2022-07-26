@@ -4,7 +4,7 @@ const ObjectID = require('mongoose').Types.ObjectId;
 module.exports.getAllUsers = async (req, res) => {
     // disable password transit and select all the users
     const users = await UserModel.find().select('-password');
-    res.status(200).json(users);
+    res.status(200).json(users);  
 }
 
 module.exports.userInfo = async (req, res) => {
@@ -45,10 +45,10 @@ module.exports.updateUser = async (req, res) => {
             upsert: true,
             setDefaultsOnInsert: true
         }
-    ).then(r => {
-        return res.status(200).send({ r });
-    }).catch(error => {
-        return res.status(500).send({ message: error });
+    ).then(docs => {
+        return res.status(200).send({ docs});
+    }).catch(err => {
+        return res.status(500).send({ message: err });
     });
 };
 
@@ -60,7 +60,7 @@ module.exports.deleteUser = async (req, res) => {
     }
     try {
         await UserModel.remove({ _id: req.params.id }).exec();
-        res.status(200).json({ message: "Successfully deleted. " });
+        res.status(200).json({ message: "Successfully deleted." });
 
     } catch (err) {
         return res.status(500).send({ message: err });
@@ -115,14 +115,14 @@ module.exports.follow = async (req, res) => {
 module.exports.unfollow = async (req, res) => {
 
     // checking if the follower/followed id are correct 
-    if (!ObjectID.isValid(req.params.id) || !ObjectID.isValid(req.body.idToFollow)) {
+    if (!ObjectID.isValid(req.params.id) || !ObjectID.isValid(req.body.idToUnfollow)) {
         res.status(400).send('ID unknown: ' + req.params.id);
     }
     try {
         let x = await UserModel.findByIdAndUpdate(
             req.params.id,
             {
-                $addToSet:
+                $pull:
                     { following: req.body.idToUnfollow }
             },
             {

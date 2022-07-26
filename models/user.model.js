@@ -7,8 +7,8 @@ const userSchema = new mongoose.Schema(
     pseudo: {
       type: String,
       required: true,
-      minLength: 3,
-      maxLength: 55,
+      minlength: 3,
+      maxlength: 55,
       unique: true,
       trim: true
     },
